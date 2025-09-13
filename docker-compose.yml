@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: freddit-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - freddit-network
+
+  # PostgreSQL for production database
+  postgres:
+    image: postgres:15-alpine
+    container_name: freddit-postgres
+    environment:
+      POSTGRES_DB: freddit
+      POSTGRES_USER: freddit
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - freddit-network
+
+  # Application (uncomment to run with Docker)
+  # app:
+  #   build: .
+  #   container_name: freddit-backend
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     - SPRING_PROFILES_ACTIVE=docker
+  #     - DB_HOST=postgres
+  #     - DB_PORT=5432
+  #     - DB_NAME=freddit
+  #     - DB_USERNAME=freddit
+  #     - DB_PASSWORD=password
+  #     - REDIS_HOST=redis
+  #     - REDIS_PORT=6379
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #   networks:
+  #     - freddit-network
+
+volumes:
+  redis_data:
+  postgres_data:
+
+networks:
+  freddit-network:
+    driver: bridge
