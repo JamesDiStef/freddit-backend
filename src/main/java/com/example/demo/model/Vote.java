@@ -23,10 +23,9 @@ public class Vote {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Enumerated(EnumType.STRING)
     @Column(name = "vote_type", nullable = false)
     @NotNull(message = "Vote type is required")
-    private VoteType voteType;
+    private String voteType;
     
     @NotNull(message = "User is required")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -48,8 +47,4 @@ public class Vote {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    
-    public enum VoteType {
-        UPVOTE, DOWNVOTE
-    }
 }

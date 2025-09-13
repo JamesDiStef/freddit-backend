@@ -13,15 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/public")
+@RequestMapping("/public")
 @Tag(name = "Health", description = "Health check endpoints")
 public class HealthController {
-
-    @Value("${app.name}")
-    private String appName;
-
-    @Value("${app.version}")
-    private String appVersion;
 
     @GetMapping("/health")
     @Operation(summary = "Health check", description = "Returns the health status of the application")
@@ -29,8 +23,8 @@ public class HealthController {
         Map<String, Object> response = new HashMap<>();
         response.put("status", "UP");
         response.put("timestamp", LocalDateTime.now());
-        response.put("application", appName);
-        response.put("version", appVersion);
+        response.put("application", "Freddit Backend");
+        response.put("version", "1.0.0");
         
         return ResponseEntity.ok(response);
     }
@@ -39,8 +33,8 @@ public class HealthController {
     @Operation(summary = "Application info", description = "Returns basic information about the application")
     public ResponseEntity<Map<String, Object>> info() {
         Map<String, Object> response = new HashMap<>();
-        response.put("name", appName);
-        response.put("version", appVersion);
+        response.put("name", "Freddit Backend");
+        response.put("version", "1.0.0");
         response.put("description", "Enterprise-level Reddit-like backend API");
         response.put("timestamp", LocalDateTime.now());
         

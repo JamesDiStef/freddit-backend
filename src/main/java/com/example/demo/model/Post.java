@@ -34,10 +34,9 @@ public class Post {
     @Column(columnDefinition = "TEXT")
     private String content;
     
-    @Enumerated(EnumType.STRING)
     @Column(name = "post_type")
     @Builder.Default
-    private PostType postType = PostType.TEXT;
+    private String postType = "TEXT";
     
     @Size(max = 500, message = "URL must not exceed 500 characters")
     private String url;
@@ -96,8 +95,4 @@ public class Post {
     
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Vote> votes;
-    
-    public enum PostType {
-        TEXT, LINK, IMAGE, VIDEO
-    }
 }

@@ -1,5 +1,6 @@
 -- Initial database schema for Freddit Backend
 -- This migration creates the basic tables for a Reddit-like application
+-- Compatible with H2 database
 
 -- Users table
 CREATE TABLE users (
@@ -14,7 +15,7 @@ CREATE TABLE users (
     is_active BOOLEAN DEFAULT TRUE,
     is_verified BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Subreddits table
@@ -31,7 +32,7 @@ CREATE TABLE subreddits (
     subscriber_count INT DEFAULT 0,
     created_by BIGINT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (created_by) REFERENCES users(id)
 );
 
@@ -40,7 +41,7 @@ CREATE TABLE posts (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(300) NOT NULL,
     content TEXT,
-    post_type ENUM('TEXT', 'LINK', 'IMAGE', 'VIDEO') DEFAULT 'TEXT',
+    post_type VARCHAR(20) DEFAULT 'TEXT',
     url VARCHAR(500),
     image_url VARCHAR(500),
     video_url VARCHAR(500),
@@ -53,7 +54,7 @@ CREATE TABLE posts (
     author_id BIGINT NOT NULL,
     subreddit_id BIGINT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (author_id) REFERENCES users(id),
     FOREIGN KEY (subreddit_id) REFERENCES subreddits(id)
 );
@@ -69,7 +70,7 @@ CREATE TABLE comments (
     author_id BIGINT NOT NULL,
     post_id BIGINT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (parent_comment_id) REFERENCES comments(id),
     FOREIGN KEY (author_id) REFERENCES users(id),
     FOREIGN KEY (post_id) REFERENCES posts(id)
@@ -78,17 +79,17 @@ CREATE TABLE comments (
 -- Votes table (for posts and comments)
 CREATE TABLE votes (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    vote_type ENUM('UPVOTE', 'DOWNVOTE') NOT NULL,
+    vote_type VARCHAR(20) NOT NULL,
     user_id BIGINT NOT NULL,
     post_id BIGINT,
     comment_id BIGINT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (post_id) REFERENCES posts(id),
     FOREIGN KEY (comment_id) REFERENCES comments(id),
-    UNIQUE KEY unique_user_post_vote (user_id, post_id),
-    UNIQUE KEY unique_user_comment_vote (user_id, comment_id)
+    CONSTRAINT unique_user_post_vote UNIQUE (user_id, post_id),
+    CONSTRAINT unique_user_comment_vote UNIQUE (user_id, comment_id)
 );
 
 -- Subscriptions table (users subscribing to subreddits)
@@ -99,7 +100,7 @@ CREATE TABLE subscriptions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (subreddit_id) REFERENCES subreddits(id),
-    UNIQUE KEY unique_user_subreddit_subscription (user_id, subreddit_id)
+    CONSTRAINT unique_user_subreddit_subscription UNIQUE (user_id, subreddit_id)
 );
 
 -- Create indexes for better performance
